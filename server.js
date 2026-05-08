@@ -6,20 +6,23 @@ const app = express();
 app.use(cors());
 
 async function getBTCPrice() {
+
   const response = await fetch(
-    'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'
   );
 
   return await response.json();
 }
 
 app.get('/', async (req, res) => {
+
   try {
+
     const data = await getBTCPrice();
 
     res.json({
       status: 'AlphaNode Backend Running',
-      live: data
+      btc_price: data.bitcoin.usd
     });
 
   } catch (err) {
@@ -29,6 +32,7 @@ app.get('/', async (req, res) => {
     });
 
   }
+
 });
 
 const PORT = process.env.PORT || 3000;
