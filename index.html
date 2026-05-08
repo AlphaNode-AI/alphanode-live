@@ -75,20 +75,31 @@ Loading...
 
 <script>
 
+let lastPrice = null;
+
 async function loadPrice(){
 
-  const response = await fetch('https://your-backend.up.railway.app');
+  const res = await fetch('YOUR_RAILWAY_URL');
+  const data = await res.json();
 
-  const data = await response.json();
+  const price = data.btc_price;
 
-  document.getElementById('price').innerHTML =
-    '$' + data.btc_price;
+  document.getElementById('price').innerHTML = '$' + price;
 
+  if(lastPrice){
+
+    let diff = price - lastPrice;
+
+    document.getElementById('change').innerHTML =
+      diff > 0 ? '📈 +'+diff : '📉 '+diff;
+
+  }
+
+  lastPrice = price;
 }
 
 loadPrice();
-
-setInterval(loadPrice, 5000);
+setInterval(loadPrice, 3000);
 
 </script>
 
