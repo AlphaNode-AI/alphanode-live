@@ -1,33 +1,34 @@
 const express = require('express');
 const cors = require('cors');
-const WebSocket = require('ws');
 
 const app = express();
 
 app.use(cors());
 
-let latestPrice = null;
+async function getBTCPrice() {
+  const response = await fetch(
+    'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+  );
 
-const ws = new WebSocket(
-  'wss://stream.binance.com:9443/ws/btcusdt@ticker'
-);
+  return await response.json();
+}
 
-ws.on('message', (data) => {
-  const ticker = JSON.parse(data);
+app.get('/', async (req, res) => {
+  try {
+    const data = await getBTCPrice();
 
-  latestPrice = {
-    symbol: ticker.s,
-    price: ticker.c
-  };
+    res.json({
+      status: 'AlphaNode Backend Running',
+      live: data
+    });
 
-  console.log(latestPrice);
-});
+  } catch (err) {
 
-app.get('/', (req, res) => {
-  res.json({
-    status: 'AlphaNode Backend Running',
-    live: latestPrice
-  });
+    res.json({
+      error: err.message
+    });
+
+  }
 });
 
 const PORT = process.env.PORT || 3000;
